@@ -83,22 +83,29 @@
     }
 
     /* Button styling */
-    .calculate-btn {
-      width: 100%;
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .calculate-btn, .export-btn {
+      flex: 1;
       padding: 12px;
       font-size: 1em;
       font-weight: bold;
       border: none;
       border-radius: 5px;
-      background-color: #2575fc;
-      color: #fff;
       cursor: pointer;
       transition: background-color 0.3s;
+      color: #fff;
     }
 
-    .calculate-btn:hover {
-      background-color: #6a11cb;
-    }
+    .calculate-btn { background-color: #2575fc; }
+    .calculate-btn:hover { background-color: #6a11cb; }
+
+    .export-btn { background-color: #4CAF50; }
+    .export-btn:hover { background-color: #45a049; }
   </style>
 </head>
 <body>
@@ -128,7 +135,12 @@
     <input type="number" id="rounds" value="5">
   </div>
   
-  <button class="calculate-btn" onclick="generateResults()">Calculate</button>
+  <div class="button-group">
+    <button class="calculate-btn" onclick="generateResults()">Calculate</button>
+    <button class="export-btn" onclick="exportToCSV()">Export CSV</button>
+    <button class="export-btn" onclick="exportToPDF()">Export PDF</button>
+    <button class="export-btn" onclick="exportToJPEG()">Export JPEG</button>
+  </div>
 
   <!-- Result Table -->
   <table id="resultTable">
@@ -147,9 +159,10 @@
   </table>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
   function generateResults() {
-    // Get values from input fields
     let initialStake = parseFloat(document.getElementById('initialStake').value);
     let stakeIncreaseBy = parseFloat(document.getElementById('stakeIncreaseBy').value);
     let odd = parseFloat(document.getElementById('odd').value);
@@ -157,17 +170,15 @@
     let rounds = parseInt(document.getElementById('rounds').value);
 
     let tableBody = document.getElementById('resultTable').querySelector('tbody');
-    tableBody.innerHTML = ''; // Clear previous results
+    tableBody.innerHTML = '';
     let currentStake = initialStake;
     let totalLoss = 0;
 
     for (let i = 1; i <= rounds; i++) {
-      // Calculate additional values
       let stakePlusAddXtr = currentStake + addXtr;
       let possibleProfit = stakePlusAddXtr * odd;
       totalLoss += currentStake;
 
-      // Create a new row and insert values
       let row = document.createElement('tr');
       row.innerHTML = `
         <td>${i}</td>
@@ -178,9 +189,44 @@
       `;
       tableBody.appendChild(row);
 
-      // Increase stake for the next round
       currentStake *= stakeIncreaseBy;
     }
+  }
+
+  function exportToCSV() {
+    let csv = [];
+    let rows = document.querySelectorAll("table tr");
+
+    rows.forEach(row => {
+      let rowData = [];
+      row.querySelectorAll("td, th").forEach(cell => rowData.push(cell.innerText));
+      csv.push(rowData.join(","));
+    });
+
+    let csvContent = "data:text/csv;charset=utf-8," + csv.join("\n");
+    let link = document.createElement("a");
+    link.setAttribute("href", encodeURI(csvContent));
+    link.setAttribute("download", "stake_profit_calculator.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  function exportToPDF() {
+    const { jsPDF } = window.jspdf;
+    let pdf = new jsPDF();
+    pdf.text("Stake and Profit Calculator", 10, 10);
+    pdf.autoTable({ html: "#resultTable", startY: 20 });
+    pdf.save("stake_profit_calculator.pdf");
+  }
+
+  function exportToJPEG() {
+    html2canvas(document.querySelector(".container")).then(canvas => {
+      let link = document.createElement("a");
+      link.href = canvas.toDataURL("image/jpeg");
+      link.download = "stake_profit_calculator.jpg";
+      link.click();
+    });
   }
 </script>
 
