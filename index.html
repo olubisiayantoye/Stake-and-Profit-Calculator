@@ -83,29 +83,23 @@
     }
 
     /* Button styling */
-    .button-group {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
-    }
-
     .calculate-btn, .export-btn {
-      flex: 1;
+      width: 100%;
       padding: 12px;
       font-size: 1em;
       font-weight: bold;
       border: none;
       border-radius: 5px;
+      background-color: #2575fc;
+      color: #fff;
       cursor: pointer;
       transition: background-color 0.3s;
-      color: #fff;
+      margin-top: 10px;
     }
 
-    .calculate-btn { background-color: #2575fc; }
-    .calculate-btn:hover { background-color: #6a11cb; }
-
-    .export-btn { background-color: #4CAF50; }
-    .export-btn:hover { background-color: #45a049; }
+    .calculate-btn:hover, .export-btn:hover {
+      background-color: #6a11cb;
+    }
   </style>
 </head>
 <body>
@@ -135,12 +129,12 @@
     <input type="number" id="rounds" value="5">
   </div>
   
-  <div class="button-group">
-    <button class="calculate-btn" onclick="generateResults()">Calculate</button>
-    <button class="export-btn" onclick="exportToCSV()">Export CSV</button>
-    <button class="export-btn" onclick="exportToPDF()">Export PDF</button>
-    <button class="export-btn" onclick="exportToJPEG()">Export JPEG</button>
-  </div>
+  <button class="calculate-btn" onclick="generateResults()">Calculate</button>
+
+  <!-- Export Buttons -->
+  <button class="export-btn" onclick="exportToCSV()">Export to CSV</button>
+  <button class="export-btn" onclick="exportToPDF()">Export to PDF</button>
+  <button class="export-btn" onclick="exportToJPEG()">Export to JPEG</button>
 
   <!-- Result Table -->
   <table id="resultTable">
@@ -161,8 +155,10 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 <script>
   function generateResults() {
+    // Get values from input fields
     let initialStake = parseFloat(document.getElementById('initialStake').value);
     let stakeIncreaseBy = parseFloat(document.getElementById('stakeIncreaseBy').value);
     let odd = parseFloat(document.getElementById('odd').value);
@@ -170,7 +166,7 @@
     let rounds = parseInt(document.getElementById('rounds').value);
 
     let tableBody = document.getElementById('resultTable').querySelector('tbody');
-    tableBody.innerHTML = '';
+    tableBody.innerHTML = ''; // Clear previous results
     let currentStake = initialStake;
     let totalLoss = 0;
 
@@ -193,36 +189,34 @@
     }
   }
 
+  // Export Table to CSV
   function exportToCSV() {
-    let csv = [];
-    let rows = document.querySelectorAll("table tr");
+    const rows = Array.from(document.querySelectorAll("#resultTable tr")).map(row => {
+      return Array.from(row.querySelectorAll("th, td")).map(cell => cell.innerText).join(",");
+    }).join("\n");
 
-    rows.forEach(row => {
-      let rowData = [];
-      row.querySelectorAll("td, th").forEach(cell => rowData.push(cell.innerText));
-      csv.push(rowData.join(","));
-    });
-
-    let csvContent = "data:text/csv;charset=utf-8," + csv.join("\n");
-    let link = document.createElement("a");
-    link.setAttribute("href", encodeURI(csvContent));
-    link.setAttribute("download", "stake_profit_calculator.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const blob = new Blob([rows], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "stake_profit_calculator.csv";
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
+  // Export Table to PDF
   function exportToPDF() {
     const { jsPDF } = window.jspdf;
-    let pdf = new jsPDF();
-    pdf.text("Stake and Profit Calculator", 10, 10);
-    pdf.autoTable({ html: "#resultTable", startY: 20 });
-    pdf.save("stake_profit_calculator.pdf");
+    const doc = new jsPDF();
+    doc.text("Stake and Profit Calculator", 14, 10);
+    doc.autoTable({ html: "#resultTable", startY: 20 });
+    doc.save("stake_profit_calculator.pdf");
   }
 
+  // Export Table to JPEG
   function exportToJPEG() {
-    html2canvas(document.querySelector(".container")).then(canvas => {
-      let link = document.createElement("a");
+    html2canvas(document.querySelector("#resultTable")).then(canvas => {
+      const link = document.createElement("a");
       link.href = canvas.toDataURL("image/jpeg");
       link.download = "stake_profit_calculator.jpg";
       link.click();
