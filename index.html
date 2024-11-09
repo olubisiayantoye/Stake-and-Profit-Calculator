@@ -41,10 +41,30 @@
       margin-bottom: 20px;
     }
 
+    /* Form styling */
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 8px;
+      font-size: 1em;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
     /* Table styles */
     table {
       width: 100%;
       border-collapse: collapse;
+      margin-top: 20px;
     }
 
     table, th, td {
@@ -79,30 +99,38 @@
     .calculate-btn:hover {
       background-color: #6a11cb;
     }
-
-    /* Responsive design */
-    @media (max-width: 480px) {
-      .container {
-        padding: 15px;
-      }
-      h1 {
-        font-size: 1.5em;
-      }
-      th, td {
-        font-size: 0.9em;
-        padding: 8px;
-      }
-      .calculate-btn {
-        font-size: 0.9em;
-        padding: 10px;
-      }
-    }
   </style>
 </head>
 <body>
 
 <div class="container">
   <h1>Stake and Profit Calculator</h1>
+  
+  <!-- Input form -->
+  <div class="form-group">
+    <label for="initialStake">Initial Stake:</label>
+    <input type="number" id="initialStake" value="100">
+  </div>
+  <div class="form-group">
+    <label for="stakeIncreaseBy">Stake Increase Factor:</label>
+    <input type="number" id="stakeIncreaseBy" value="2">
+  </div>
+  <div class="form-group">
+    <label for="odd">Odd:</label>
+    <input type="number" id="odd" value="2">
+  </div>
+  <div class="form-group">
+    <label for="addXtr">Add Extra:</label>
+    <input type="number" id="addXtr" value="100">
+  </div>
+  <div class="form-group">
+    <label for="rounds">Rounds:</label>
+    <input type="number" id="rounds" value="5">
+  </div>
+  
+  <button class="calculate-btn" onclick="generateResults()">Calculate</button>
+
+  <!-- Result Table -->
   <table id="resultTable">
     <thead>
       <tr>
@@ -117,18 +145,17 @@
       <!-- Data will be inserted here by JavaScript -->
     </tbody>
   </table>
-  <button class="calculate-btn" onclick="generateResults()">Calculate</button>
 </div>
 
 <script>
-  // Define initial values
-  let initialStake = 100;
-  let stakeIncreaseBy = 2;
-  let odd = 2;
-  let addXtr = 100;
-  let rounds = 5;
-
   function generateResults() {
+    // Get values from input fields
+    let initialStake = parseFloat(document.getElementById('initialStake').value);
+    let stakeIncreaseBy = parseFloat(document.getElementById('stakeIncreaseBy').value);
+    let odd = parseFloat(document.getElementById('odd').value);
+    let addXtr = parseFloat(document.getElementById('addXtr').value);
+    let rounds = parseInt(document.getElementById('rounds').value);
+
     let tableBody = document.getElementById('resultTable').querySelector('tbody');
     tableBody.innerHTML = ''; // Clear previous results
     let currentStake = initialStake;
@@ -144,10 +171,10 @@
       let row = document.createElement('tr');
       row.innerHTML = `
         <td>${i}</td>
-        <td>$${currentStake}</td>
-        <td>$${stakePlusAddXtr}</td>
-        <td>$${totalLoss}</td>
-        <td>$${possibleProfit}</td>
+        <td>$${currentStake.toFixed(2)}</td>
+        <td>$${stakePlusAddXtr.toFixed(2)}</td>
+        <td>$${totalLoss.toFixed(2)}</td>
+        <td>$${possibleProfit.toFixed(2)}</td>
       `;
       tableBody.appendChild(row);
 
