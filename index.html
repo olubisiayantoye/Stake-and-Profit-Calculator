@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stake and Profit Calculator</title>
+  <style>
+    /* Basic reset and styling */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: linear-gradient(to right, #6a11cb, #2575fc);
+      color: #fff;
+      padding: 20px;
+    }
+
+    /* Card container */
+    .container {
+      max-width: 600px;
+      width: 100%;
+      background: #fff;
+      color: #333;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.8em;
+      color: #2575fc;
+      margin-bottom: 20px;
+    }
+
+    /* Table styles */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: center;
+      font-size: 1em;
+    }
+
+    th {
+      background-color: #6a11cb;
+      color: #fff;
+    }
+
+    /* Button styling */
+    .calculate-btn {
+      width: 100%;
+      padding: 12px;
+      font-size: 1em;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      background-color: #2575fc;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .calculate-btn:hover {
+      background-color: #6a11cb;
+    }
+
+    /* Responsive design */
+    @media (max-width: 480px) {
+      .container {
+        padding: 15px;
+      }
+      h1 {
+        font-size: 1.5em;
+      }
+      th, td {
+        font-size: 0.9em;
+        padding: 8px;
+      }
+      .calculate-btn {
+        font-size: 0.9em;
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Stake and Profit Calculator</h1>
+  <table id="resultTable">
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>Stake</th>
+        <th>Stake + Add Xtr</th>
+        <th>Possible Loss</th>
+        <th>Possible Profit</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Data will be inserted here by JavaScript -->
+    </tbody>
+  </table>
+  <button class="calculate-btn" onclick="generateResults()">Calculate</button>
+</div>
+
+<script>
+  // Define initial values
+  let initialStake = 100;
+  let stakeIncreaseBy = 2;
+  let odd = 2;
+  let addXtr = 100;
+  let rounds = 5;
+
+  function generateResults() {
+    let tableBody = document.getElementById('resultTable').querySelector('tbody');
+    tableBody.innerHTML = ''; // Clear previous results
+    let currentStake = initialStake;
+    let totalLoss = 0;
+
+    for (let i = 1; i <= rounds; i++) {
+      // Calculate additional values
+      let stakePlusAddXtr = currentStake + addXtr;
+      let possibleProfit = stakePlusAddXtr * odd;
+      totalLoss += currentStake;
+
+      // Create a new row and insert values
+      let row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${i}</td>
+        <td>$${currentStake}</td>
+        <td>$${stakePlusAddXtr}</td>
+        <td>$${totalLoss}</td>
+        <td>$${possibleProfit}</td>
+      `;
+      tableBody.appendChild(row);
+
+      // Increase stake for the next round
+      currentStake *= stakeIncreaseBy;
+    }
+  }
+</script>
+
+</body>
+</html>
